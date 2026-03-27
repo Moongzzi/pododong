@@ -1,0 +1,30 @@
+.grape-cluster-page {
+  width: min(1080px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 2.4rem 0 3.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.grape-cluster-page__status {
+  margin: 0;
+  color: rgba(22, 22, 22, 0.68);
+  font-size: 0.98rem;
+  line-height: 1.6;
+}
+
+.grape-cluster-page__status--success {
+  color: #226d49;
+}
+
+.grape-cluster-page__status--error {
+  color: #8d1e3c;
+}
+
+@media (max-width: 767px) {
+  .grape-cluster-page {
+    width: min(100%, calc(100% - 1rem));
+    padding: 1.5rem 0 2.5rem;
+  }
+}

@@ -1,0 +1,69 @@
+.auth-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.55rem;
+  width: 120px;
+  height: 40px;
+  padding: 0.25rem 0.9rem 0.25rem 0.45rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--color-button);
+  color: var(--color-text);
+  text-decoration: none;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease;
+}
+
+.auth-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(109, 63, 156, 0.18);
+  filter: saturate(1.05);
+}
+
+.auth-button:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+.auth-button__icon-wrap {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+}
+
+.auth-button__icon-shadow,
+.auth-button__icon {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+}
+
+.auth-button__icon-shadow {
+  transform: translate(3px, 3px);
+  background: var(--color-primary-dark);
+}
+
+.auth-button__icon {
+  display: grid;
+  place-items: center;
+  background: var(--color-primary);
+  color: var(--color-white);
+}
+
+.auth-button__icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.auth-button__label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}

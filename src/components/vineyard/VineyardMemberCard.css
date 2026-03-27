@@ -1,0 +1,101 @@
+.vineyard-member-card {
+  display: grid;
+  gap: 1rem;
+  padding: 1.25rem;
+  border: 1px solid rgba(109, 63, 156, 0.12);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at top left, rgba(203, 187, 226, 0.4), transparent 34%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(249, 245, 252, 0.98));
+  box-shadow: 0 20px 40px rgba(79, 59, 104, 0.08);
+}
+
+.vineyard-member-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.vineyard-member-card__label,
+.vineyard-member-card__name,
+.vineyard-member-card__count {
+  margin: 0;
+}
+
+.vineyard-member-card__label {
+  color: rgba(79, 59, 104, 0.7);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.vineyard-member-card__name {
+  margin-top: 0.35rem;
+  color: var(--color-text);
+  font-size: 1.3rem;
+  font-weight: 800;
+}
+
+.vineyard-member-card__count {
+  flex-shrink: 0;
+  min-width: 82px;
+  padding: 0.6rem 0.9rem;
+  border-radius: 999px;
+  background: rgba(109, 63, 156, 0.12);
+  color: var(--color-primary);
+  font-size: 1rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.vineyard-member-card__board {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 860 / 588;
+  border-radius: 22px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.vineyard-member-card__background,
+.vineyard-member-card__overlay {
+  width: 100%;
+  height: 100%;
+}
+
+.vineyard-member-card__background {
+  display: block;
+  object-fit: cover;
+}
+
+.vineyard-member-card__overlay {
+  position: absolute;
+  inset: 0;
+}
+
+.vineyard-member-card__grape {
+  position: absolute;
+  width: 10.7%;
+  transform: translate(-52%, -42%);
+}
+
+.vineyard-member-card__grape img {
+  display: block;
+  width: 100%;
+}
+
+@media (max-width: 767px) {
+  .vineyard-member-card {
+    padding: 1rem;
+    border-radius: 24px;
+  }
+
+  .vineyard-member-card__header {
+    flex-direction: column;
+  }
+
+  .vineyard-member-card__count {
+    min-width: auto;
+  }
+}

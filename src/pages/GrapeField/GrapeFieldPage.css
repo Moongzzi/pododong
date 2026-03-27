@@ -1,0 +1,115 @@
+.grape-field-page {
+  width: min(1200px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 2.4rem 0 3.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.grape-field-hero,
+.grape-field-ranking {
+  padding: clamp(1.2rem, 3vw, 2rem);
+  border: 1px solid rgba(109, 63, 156, 0.1);
+  border-radius: 32px;
+  background:
+    radial-gradient(circle at top right, rgba(203, 187, 226, 0.36), transparent 30%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(246, 241, 250, 0.98));
+  box-shadow: 0 24px 50px rgba(79, 59, 104, 0.08);
+}
+
+.grape-field-hero__eyebrow,
+.grape-field-hero__title,
+.grape-field-hero__description,
+.grape-field-ranking__title,
+.grape-field-ranking__meta {
+  margin: 0;
+}
+
+.grape-field-hero__eyebrow {
+  color: var(--color-primary);
+  font-size: 0.88rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+}
+
+.grape-field-hero__title {
+  margin-top: 0.75rem;
+  color: var(--color-text);
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  line-height: 1.08;
+}
+
+.grape-field-hero__description {
+  max-width: 720px;
+  margin-top: 0.9rem;
+  color: rgba(79, 59, 104, 0.76);
+  font-size: 1.02rem;
+  line-height: 1.7;
+}
+
+.grape-field-ranking__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.grape-field-ranking__title {
+  color: var(--color-text);
+  font-size: 1.35rem;
+  font-weight: 800;
+}
+
+.grape-field-ranking__meta {
+  color: rgba(79, 59, 104, 0.7);
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.grape-field-ranking__list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+  margin: 1.25rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.grape-field-page__status {
+  margin: 1rem 0 0;
+  color: rgba(79, 59, 104, 0.72);
+  font-size: 0.96rem;
+  line-height: 1.6;
+}
+
+.grape-field-page__status--error {
+  color: #8d1e3c;
+}
+
+.grape-field-ranking__item {
+  min-width: 0;
+}
+
+@media (max-width: 1023px) {
+  .grape-field-ranking__list {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 767px) {
+  .grape-field-page {
+    width: min(100%, calc(100% - 1rem));
+    padding: 1.5rem 0 2.5rem;
+  }
+
+  .grape-field-hero,
+  .grape-field-ranking {
+    border-radius: 24px;
+  }
+
+  .grape-field-ranking__header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

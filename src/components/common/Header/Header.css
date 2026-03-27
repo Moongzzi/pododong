@@ -1,0 +1,122 @@
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(79, 59, 104, 0.08);
+}
+
+.site-header__inner {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 2rem;
+  max-width: 1440px;
+  margin: 0 auto;
+  min-height: 86px;
+  padding: 0.5rem 2rem;
+}
+
+.site-header__brand {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 70px;
+  color: inherit;
+}
+
+.site-header__brand:focus-visible,
+.site-header__nav-link:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 4px;
+  border-radius: 14px;
+}
+
+.site-header__brand-image {
+  width: 50px;
+  height: 70px;
+  object-fit: contain;
+  display: block;
+}
+
+.site-header__nav {
+  justify-self: start;
+}
+
+.site-header__nav-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: clamp(1.5rem, 3vw, 4rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-header__nav-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--color-text);
+  font-size: 1.05rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 180ms ease, transform 180ms ease;
+}
+
+.site-header__nav-link:hover {
+  color: var(--color-primary);
+  transform: translateY(-1px);
+}
+
+.site-header__nav-link--active {
+  color: var(--color-primary);
+}
+
+.site-header__action {
+  justify-self: end;
+}
+
+@media (max-width: 1023px) {
+  .site-header__inner {
+    grid-template-columns: auto 1fr;
+    gap: 1rem 1.5rem;
+    min-height: auto;
+  }
+
+  .site-header__nav {
+    grid-column: 1 / -1;
+    order: 3;
+  }
+
+  .site-header__action {
+    justify-self: end;
+  }
+}
+
+@media (max-width: 767px) {
+  .site-header__inner {
+    padding: 0.5rem 1rem 0.85rem;
+  }
+
+  .site-header__brand {
+    width: 50px;
+    height: 70px;
+  }
+
+  .site-header__brand-image {
+    width: 50px;
+    height: 70px;
+  }
+
+  .site-header__nav-list {
+    gap: 0.5rem 1.25rem;
+  }
+
+  .site-header__nav-link {
+    min-height: 40px;
+    font-size: 0.98rem;
+  }
+}

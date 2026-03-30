@@ -86,6 +86,24 @@ The workflow:
 - builds the app with `npm run build`
 - publishes the `build` output to GitHub Pages
 
+### Required GitHub Secrets
+
+Because this app is built with Create React App, the Supabase browser config must be present at build time.
+Local `.env.local` values are not available in GitHub Actions, so you must add these repository secrets before deploying:
+
+- `REACT_APP_SUPABASE_URL`
+- `REACT_APP_SUPABASE_ANON_KEY`
+
+Setup steps:
+
+1. Open the GitHub repository.
+2. Go to `Settings` -> `Secrets and variables` -> `Actions`.
+3. Add `REACT_APP_SUPABASE_URL` with your Supabase project URL.
+4. Add `REACT_APP_SUPABASE_ANON_KEY` with your Supabase anon key.
+5. Push to `master` again, or rerun the `Deploy to GitHub Pages` workflow.
+
+If either secret is missing, the Pages workflow now fails during the build step instead of deploying a login page with Supabase disabled.
+
 ### Notes
 
 - The app uses a repository base path of `/pododong`.

@@ -9,6 +9,24 @@
       name="description"
       content="Web site created using create-react-app"
     />
+    <script>
+      (function redirectGitHubPagesSpa() {
+        var search = window.location.search;
+        if (!search || search.length <= 1 || search[1] !== '/') {
+          return;
+        }
+
+        var decoded = search
+          .slice(1)
+          .split('&')
+          .map(function (segment) {
+            return segment.replace(/~and~/g, '&');
+          })
+          .join('?');
+
+        window.history.replaceState(null, '', window.location.pathname.slice(0, -1) + decoded + window.location.hash);
+      })();
+    </script>
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
     <!--
       manifest.json provides metadata used when your web app is installed on a
@@ -24,7 +42,7 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
-    <title>React App</title>
+    <title>Pododong</title>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>

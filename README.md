@@ -65,6 +65,32 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/a
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
 
+## GitHub Pages
+
+This project is configured to deploy to GitHub Pages at [https://moongzzi.github.io/pododong/](https://moongzzi.github.io/pododong/).
+
+### One-time GitHub setup
+
+1. Push this repository to GitHub.
+2. Open the repository settings in GitHub.
+3. Go to `Settings` -> `Pages`.
+4. Set `Source` to `GitHub Actions`.
+
+### Deployment flow
+
+Every push to the `master` branch runs the Pages workflow in `.github/workflows/deploy-pages.yml`.
+
+The workflow:
+
+- installs dependencies with `npm ci`
+- builds the app with `npm run build`
+- publishes the `build` output to GitHub Pages
+
+### Notes
+
+- The app uses a repository base path of `/pododong`.
+- A `404.html` fallback is included so React Router routes keep working after refresh on GitHub Pages.
+
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)

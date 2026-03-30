@@ -1,6 +1,7 @@
 {
   "name": "pododong",
   "version": "0.1.0",
+  "homepage": "https://moongzzi.github.io/pododong",
   "private": true,
   "dependencies": {
     "@supabase/supabase-js": "^2.100.1",

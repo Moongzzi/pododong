@@ -56,6 +56,55 @@ async function ensureOwnProfile(userId, loginName) {
   return fetchOwnProfile(userId, loginName);
 }
 
+function getProfileSeedFromUser(user) {
+  const rawLoginName =
+    user?.user_metadata?.login_name ??
+    user?.user_metadata?.display_name ??
+    user?.raw_user_meta_data?.login_name ??
+    user?.raw_user_meta_data?.display_name ??
+    '';
+
+  const loginName = normalizeLoginName(rawLoginName);
+
+  if (!user?.id || !loginName) {
+    return null;
+  }
+
+  return {
+    userId: user.id,
+    loginName,
+  };
+}
+
+export async function ensureCurrentUserProfile(user = null) {
+  if (!supabase) {
+    throw new Error('Supabase 설정이 완료되지 않았습니다.');
+  }
+
+  let nextUser = user;
+
+  if (!nextUser) {
+    const {
+      data: { user: authenticatedUser },
+      error,
+    } = await supabase.auth.getUser();
+
+    if (error) {
+      throw new Error('현재 사용자 정보를 확인하지 못했습니다.');
+    }
+
+    nextUser = authenticatedUser;
+  }
+
+  const profileSeed = getProfileSeedFromUser(nextUser);
+
+  if (!profileSeed) {
+    return null;
+  }
+
+  return ensureOwnProfile(profileSeed.userId, profileSeed.loginName);
+}
+
 export async function loginWithNamePassword({ loginName, password }) {
   if (!supabase) {
     throw new Error('Supabase 설정이 완료되지 않았습니다.');

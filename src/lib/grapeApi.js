@@ -1,4 +1,5 @@
 import { FILLED_GRAPE_VARIANTS } from '../constants/grapeCluster';
+import { ensureCurrentUserProfile } from './auth';
 import { supabase } from './supabase';
 
 function ensureSupabase() {
@@ -50,6 +51,7 @@ export async function fetchGrapeField(targetMonth = getMonthStart()) {
 
 export async function fetchMyGrapeCluster(targetMonth = getMonthStart()) {
   ensureSupabase();
+  await ensureCurrentUserProfile();
 
   const { data, error } = await supabase.rpc('get_my_grape_cluster', {
     p_target_month: targetMonth,
@@ -64,6 +66,7 @@ export async function fetchMyGrapeCluster(targetMonth = getMonthStart()) {
 
 export async function fetchMonthlyGoal({ userId, targetMonth = getMonthStart() }) {
   ensureSupabase();
+  await ensureCurrentUserProfile();
 
   const { data, error } = await supabase
     .from('monthly_goals')
@@ -81,6 +84,7 @@ export async function fetchMonthlyGoal({ userId, targetMonth = getMonthStart() }
 
 export async function saveMonthlyGoal({ userId, goalText, targetMonth = getMonthStart() }) {
   ensureSupabase();
+  await ensureCurrentUserProfile();
 
   const { data, error } = await supabase
     .from('monthly_goals')
@@ -105,6 +109,7 @@ export async function saveMonthlyGoal({ userId, goalText, targetMonth = getMonth
 
 export async function addGrapeEntry({ userId, fillDate = getDateString(), variant = getRandomVariant() }) {
   ensureSupabase();
+  await ensureCurrentUserProfile();
 
   const { data, error } = await supabase
     .from('grape_entries')

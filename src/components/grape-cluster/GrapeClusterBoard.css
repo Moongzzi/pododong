@@ -32,21 +32,39 @@
 .grape-board__canvas {
   position: relative;
   width: min(100%, 860px);
+  aspect-ratio: 1332 / 960;
+  border-radius: 1.75rem;
+  overflow: hidden;
+  background: radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.95), rgba(239, 233, 247, 0.86));
 }
 
 .grape-board__background,
 .grape-board__overlay {
+  position: absolute;
+  inset: 0;
   width: 100%;
-  display: block;
 }
 
 .grape-board__background {
-  height: auto;
+  display: block;
+  height: 100%;
+  object-fit: contain;
 }
 
 .grape-board__overlay {
+  display: block;
+}
+
+.grape-board__background-fallback {
   position: absolute;
   inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+  color: rgba(79, 59, 104, 0.82);
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-align: center;
 }
 
 .grape-board__grape-wrapper {

@@ -3,7 +3,7 @@ import './VineyardMemberCard.css';
 import {
   FILLED_GRAPE_IMAGE_MAP,
   FILLED_GRAPE_VARIANTS,
-  GRAPE_POSITIONS,
+  getGrapePositions,
   MONTH_BACKGROUND_MAP,
 } from '../../constants/grapeCluster';
 
@@ -23,7 +23,7 @@ export function VineyardMemberCard({ member }) {
   const maxCount = monthLength;
   const filledCount = Math.min(member.grapeCount, maxCount);
   const backgroundImage = MONTH_BACKGROUND_MAP[monthLength];
-  const positions = GRAPE_POSITIONS.slice(0, maxCount);
+  const positions = getGrapePositions(maxCount);
   const fills = createPreviewFills(filledCount);
 
   return (

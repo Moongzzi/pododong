@@ -1,6 +1,8 @@
 import './GrapeClusterBoard.css';
 
-import { FILLED_GRAPE_IMAGE_MAP } from '../../constants/grapeCluster';
+import { useEffect, useState } from 'react';
+
+import { FILLED_GRAPE_IMAGE_MAP, MONTH_BACKGROUND_MAP } from '../../constants/grapeCluster';
 
 function FilledGrape({ fill, position }) {
   return (
@@ -21,6 +23,27 @@ export function GrapeClusterBoard({
   isGoalReady = true,
   inspectionMode = false,
 }) {
+  const [hasBackgroundError, setHasBackgroundError] = useState(false);
+  const [activeBackgroundImage, setActiveBackgroundImage] = useState(
+    backgroundImage ?? MONTH_BACKGROUND_MAP[maxCount] ?? null
+  );
+
+  useEffect(() => {
+    setActiveBackgroundImage(backgroundImage ?? MONTH_BACKGROUND_MAP[maxCount] ?? null);
+    setHasBackgroundError(false);
+  }, [backgroundImage, maxCount]);
+
+  function handleBackgroundError() {
+    const fallbackImage = MONTH_BACKGROUND_MAP[maxCount] ?? null;
+
+    if (fallbackImage && fallbackImage !== activeBackgroundImage) {
+      setActiveBackgroundImage(fallbackImage);
+      return;
+    }
+
+    setHasBackgroundError(true);
+  }
+
   return (
     <section className="grape-board" aria-labelledby="grape-board-title">
       <div className="grape-board__status-row">
@@ -31,7 +54,16 @@ export function GrapeClusterBoard({
       </div>
 
       <div className="grape-board__canvas">
-        <img className="grape-board__background" src={backgroundImage} alt="이번 달 포도송이 배경판" />
+        {activeBackgroundImage && !hasBackgroundError ? (
+          <img
+            className="grape-board__background"
+            src={activeBackgroundImage}
+            alt="이번 달 포도송이 배경판"
+            onError={handleBackgroundError}
+          />
+        ) : (
+          <div className="grape-board__background-fallback">배경판 이미지를 불러오지 못했습니다.</div>
+        )}
 
         <div className="grape-board__overlay" aria-hidden="true">
           {fills.map((fill, index) => {

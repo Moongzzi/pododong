@@ -1,6 +1,6 @@
 import './GrapeClusterPage.css';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 
 import { GrapeClusterBoard } from '../../components/grape-cluster/GrapeClusterBoard';
@@ -8,7 +8,7 @@ import { MonthlyGoalForm } from '../../components/grape-cluster/MonthlyGoalForm'
 import { Header } from '../../components/common/Header/Header';
 import {
   GRAPE_CLUSTER_INSPECTION_MODE,
-  GRAPE_POSITIONS,
+  getGrapePositions,
   MONTH_BACKGROUND_MAP,
 } from '../../constants/grapeCluster';
 import { HEADER_BRAND_LABEL, HEADER_NAV_ITEMS } from '../../constants/header';
@@ -52,7 +52,7 @@ export function GrapeClusterPage({
   const displayFills = GRAPE_CLUSTER_INSPECTION_MODE ? [] : fills;
   const isFillBlocked = !isGoalReady || hasFilledToday || fills.length >= monthLength || isSavingFill;
   const backgroundImage = MONTH_BACKGROUND_MAP[monthLength];
-  const positions = GRAPE_POSITIONS.slice(0, monthLength);
+  const positions = useMemo(() => getGrapePositions(monthLength), [monthLength]);
 
   useEffect(() => {
     if (!isSupabaseReady || !isAuthenticated) {

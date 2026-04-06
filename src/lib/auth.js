@@ -48,6 +48,22 @@ async function fetchOwnProfile(userId) {
   return data;
 }
 
+async function findProfileByLoginName(loginName) {
+  const { data, error } = await supabase.rpc('find_profile_by_login_name', {
+    p_login_name: loginName,
+  });
+
+  if (error) {
+    return null;
+  }
+
+  if (Array.isArray(data)) {
+    return data[0] ?? null;
+  }
+
+  return data ?? null;
+}
+
 async function ensureOwnProfile(userId, loginName, profileImageUrl = null) {
   const existingProfile = await fetchOwnProfile(userId);
   const nextProfile = {
@@ -142,34 +158,16 @@ export async function loginWithNamePassword({ loginName, password }) {
   }
 
   const syntheticEmail = await buildSyntheticEmail(normalizedLoginName);
+  const matchedProfile = await findProfileByLoginName(normalizedLoginName);
 
-  const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-    email: syntheticEmail,
-    password: trimmedPassword,
-    options: {
-      data: {
-        login_name: normalizedLoginName,
-        display_name: normalizedLoginName,
-      },
-    },
-  });
-
-  const isAlreadyRegistered =
-    signUpError?.code === 'user_already_exists' ||
-    signUpError?.code === 'email_exists' ||
-    (!signUpError &&
-      signUpData?.user &&
-      Array.isArray(signUpData.user.identities) &&
-      signUpData.user.identities.length === 0);
-
-  if (isAlreadyRegistered) {
+  if (matchedProfile) {
     const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
       email: syntheticEmail,
       password: trimmedPassword,
     });
 
-    if (signInError || !signInData.session || !signInData.user) {
-      throw new Error('이미 가입된 계정입니다. 비밀번호를 다시 확인해 주세요. profiles 테이블이 비어 있어도 auth 계정은 남아 있을 수 있습니다.');
+    if (signInError || !signInData?.session || !signInData.user) {
+      throw new Error('이미 가입된 계정입니다. 비밀번호를 다시 확인해 주세요.');
     }
 
     const existingProfile = await ensureOwnProfile(signInData.user.id, normalizedLoginName);
@@ -186,10 +184,41 @@ export async function loginWithNamePassword({ loginName, password }) {
     };
   }
 
+  const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+    email: syntheticEmail,
+    password: trimmedPassword,
+    options: {
+      data: {
+        login_name: normalizedLoginName,
+        display_name: normalizedLoginName,
+      },
+    },
+  });
+
   if (signUpError || !signUpData.user) {
     if (signUpError?.status === 422) {
       if (signUpError.code === 'user_already_exists' || signUpError.code === 'email_exists') {
-        throw new Error('이미 가입된 계정입니다. 비밀번호를 다시 확인해 주세요.');
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+          email: syntheticEmail,
+          password: trimmedPassword,
+        });
+
+        if (signInError || !signInData?.session || !signInData.user) {
+          throw new Error('이미 가입된 계정입니다. 비밀번호를 다시 확인해 주세요. profiles 테이블이 비어 있어도 auth 계정은 남아 있을 수 있습니다.');
+        }
+
+        const existingProfile = await ensureOwnProfile(signInData.user.id, normalizedLoginName);
+
+        return {
+          mode: 'logged-in',
+          user: {
+            id: signInData.user.id,
+            loginName: existingProfile.login_name,
+            displayName: existingProfile.display_name,
+            profileImageUrl: existingProfile.profile_image_url,
+          },
+          session: signInData.session,
+        };
       }
 
       if (signUpError.code === 'email_address_not_authorized') {
@@ -221,27 +250,18 @@ export async function loginWithNamePassword({ loginName, password }) {
   let nextSession = signUpData.session;
 
   if (!nextSession) {
-    const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-      email: syntheticEmail,
-      password: trimmedPassword,
-    });
-
-    if (signInError || !signInData.session || !signInData.user) {
-      throw new Error('회원가입 후 로그인 처리에 실패했습니다. 이메일 인증 설정을 확인해 주세요.');
-    }
-
-    nextSession = signInData.session;
+    throw new Error('회원가입은 완료됐지만 바로 로그인할 수 없습니다. Supabase Authentication 설정에서 Confirm email을 꺼 주세요.');
   }
 
-  const newProfile = await ensureOwnProfile(signUpData.user.id, normalizedLoginName);
+  const syncedProfile = await ensureOwnProfile(signUpData.user.id, normalizedLoginName);
 
   return {
     mode: 'signed-up-and-logged-in',
     user: {
       id: signUpData.user.id,
-      loginName: newProfile.login_name,
-      displayName: newProfile.display_name,
-      profileImageUrl: newProfile.profile_image_url,
+      loginName: syncedProfile.login_name,
+      displayName: syncedProfile.display_name,
+      profileImageUrl: syncedProfile.profile_image_url,
     },
     session: nextSession,
   };

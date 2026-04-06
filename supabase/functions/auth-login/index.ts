@@ -1,4 +1,12 @@
-import { createClient } from 'npm:@supabase/supabase-js@2';
+declare const Deno: {
+  serve: (handler: (request: Request) => Response | Promise<Response>) => void;
+  env: {
+    get: (key: string) => string | undefined;
+  };
+};
+
+// @ts-ignore Supabase Edge Functions resolves this import in the Deno runtime.
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -43,7 +51,7 @@ async function buildSyntheticEmail(loginName: string) {
   return `pododong.auth+${digest.slice(0, 24)}@gmail.com`;
 }
 
-Deno.serve(async (request) => {
+Deno.serve(async (request: Request) => {
   if (request.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }

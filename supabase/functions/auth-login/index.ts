@@ -11,6 +11,12 @@ type LoginRequest = {
   password?: string;
 };
 
+function normalizeProfileImageUrl(rawValue?: string | null) {
+  const trimmedValue = rawValue?.trim() ?? '';
+
+  return trimmedValue || null;
+}
+
 function jsonResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
@@ -93,7 +99,7 @@ Deno.serve(async (request) => {
 
   const { data: profile, error: profileError } = await adminClient
     .from('profiles')
-    .select('id, login_name, display_name')
+    .select('id, login_name, display_name, profile_image_url')
     .eq('login_name', normalizedLoginName)
     .maybeSingle();
 
@@ -122,6 +128,7 @@ Deno.serve(async (request) => {
       id: createdUser.user.id,
       login_name: normalizedLoginName,
       display_name: normalizedLoginName,
+      profile_image_url: null,
     });
 
     if (insertProfileError) {
@@ -144,6 +151,7 @@ Deno.serve(async (request) => {
         id: signInData.user.id,
         loginName: normalizedLoginName,
         displayName: normalizedLoginName,
+        profileImageUrl: null,
       },
       session: {
         accessToken: signInData.session.access_token,
@@ -167,6 +175,7 @@ Deno.serve(async (request) => {
       id: signInData.user.id,
       loginName: profile.login_name,
       displayName: profile.display_name,
+      profileImageUrl: normalizeProfileImageUrl(profile.profile_image_url),
     },
     session: {
       accessToken: signInData.session.access_token,

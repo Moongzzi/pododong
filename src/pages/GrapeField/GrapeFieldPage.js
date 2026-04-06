@@ -45,6 +45,7 @@ export function GrapeFieldPage({
           result.map((member) => ({
             id: member.user_id,
             name: member.display_name,
+            profileImageUrl: member.profile_image_url ?? '',
             grapeCount: Number(member.grape_count ?? 0),
             goalText: member.goal_text ?? '',
           }))

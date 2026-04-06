@@ -1,7 +1,3 @@
-drop trigger if exists on_auth_user_created on auth.users;
-drop function if exists public.handle_new_user();
-drop function if exists public.find_profile_by_login_name(text);
-
 alter table public.profiles
 add column if not exists profile_image_url text;
 
@@ -40,10 +36,6 @@ begin
 end;
 $$;
 
-create trigger on_auth_user_created
-after insert on auth.users
-for each row execute procedure public.handle_new_user();
-
 create or replace function public.find_profile_by_login_name(p_login_name text)
 returns table (
   user_id uuid,
@@ -60,5 +52,3 @@ as $$
   where p.login_name = trim(p_login_name)
   limit 1;
 $$;
-
-grant execute on function public.find_profile_by_login_name(text) to anon, authenticated;

@@ -17,10 +17,48 @@
   gap: 1rem;
 }
 
+.vineyard-member-card__identity {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  min-width: 0;
+}
+
 .vineyard-member-card__label,
 .vineyard-member-card__name,
-.vineyard-member-card__count {
+.vineyard-member-card__count,
+.vineyard-member-card__goal-label,
+.vineyard-member-card__goal {
   margin: 0;
+}
+
+.vineyard-member-card__avatar {
+  flex-shrink: 0;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(203, 187, 226, 0.95), rgba(109, 63, 156, 0.95));
+  box-shadow: inset 0 0 0 3px rgba(255, 255, 255, 0.72);
+}
+
+.vineyard-member-card__avatar-image,
+.vineyard-member-card__avatar-fallback {
+  width: 100%;
+  height: 100%;
+}
+
+.vineyard-member-card__avatar-image {
+  display: block;
+  object-fit: cover;
+}
+
+.vineyard-member-card__avatar-fallback {
+  display: grid;
+  place-items: center;
+  color: var(--color-white);
+  font-size: 1.4rem;
+  font-weight: 800;
 }
 
 .vineyard-member-card__label {
@@ -47,6 +85,29 @@
   font-size: 1rem;
   font-weight: 800;
   text-align: center;
+}
+
+.vineyard-member-card__goal-block {
+  display: grid;
+  gap: 0.45rem;
+  padding: 0.9rem 1rem;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(109, 63, 156, 0.1);
+}
+
+.vineyard-member-card__goal-label {
+  color: rgba(79, 59, 104, 0.66);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.vineyard-member-card__goal {
+  color: var(--color-text);
+  font-size: 0.98rem;
+  font-weight: 600;
+  line-height: 1.6;
 }
 
 .vineyard-member-card__board {
@@ -93,6 +154,10 @@
 
   .vineyard-member-card__header {
     flex-direction: column;
+  }
+
+  .vineyard-member-card__identity {
+    width: 100%;
   }
 
   .vineyard-member-card__count {

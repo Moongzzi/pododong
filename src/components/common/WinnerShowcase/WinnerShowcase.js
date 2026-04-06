@@ -1,12 +1,22 @@
 import './WinnerShowcase.css';
 
-function PlaceholderAvatar({ member }) {
+function MemberAvatar({ member }) {
   const initials = member.name.slice(0, 1);
+  const profileImageUrl = member.profileImageUrl?.trim();
 
   return (
     <div className={`winner-showcase__avatar ${member.accentClassName}`} aria-hidden="true">
-      <span className="winner-showcase__avatar-ring" />
-      <span className="winner-showcase__avatar-core">{initials}</span>
+      {profileImageUrl ? (
+        <>
+          <img className="winner-showcase__avatar-image" src={profileImageUrl} alt={`${member.name} 프로필 이미지`} />
+          <span className="winner-showcase__avatar-ring" />
+        </>
+      ) : (
+        <>
+          <span className="winner-showcase__avatar-ring" />
+          <span className="winner-showcase__avatar-core">{initials}</span>
+        </>
+      )}
     </div>
   );
 }
@@ -17,7 +27,7 @@ function WinnerCard({ member }) {
       <div className="winner-showcase__badge" aria-hidden="true">
         {member.badgeLabel}
       </div>
-      <PlaceholderAvatar member={member} />
+      <MemberAvatar member={member} />
       <p className="winner-showcase__name">{member.name}</p>
     </article>
   );

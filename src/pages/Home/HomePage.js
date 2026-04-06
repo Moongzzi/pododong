@@ -45,6 +45,7 @@ export function HomePage({ authState = 'loggedOut', onLogout, isSupabaseReady = 
             id: member.user_id,
             rank: Number(member.rank),
             name: member.display_name,
+            profileImageUrl: member.profile_image_url ?? '',
             badgeLabel: `${member.rank}등`,
             accentClassName: RANK_ACCENT_CLASS[member.rank] || 'winner-showcase__avatar--sky',
           }))

@@ -4,6 +4,24 @@ function normalizeLoginName(rawValue) {
   return rawValue.normalize('NFC').trim();
 }
 
+function normalizeProfileImageUrl(rawValue) {
+  if (typeof rawValue !== 'string') {
+    return null;
+  }
+
+  const trimmedValue = rawValue.trim();
+
+  return trimmedValue || null;
+}
+
+function buildFallbackProfile(loginName, profileImageUrl = null) {
+  return {
+    login_name: loginName,
+    display_name: loginName,
+    profile_image_url: normalizeProfileImageUrl(profileImageUrl),
+  };
+}
+
 async function sha256Hex(value) {
   const data = new TextEncoder().encode(value);
   const digest = await window.crypto.subtle.digest('SHA-256', data);
@@ -16,44 +34,39 @@ async function buildSyntheticEmail(loginName) {
   return `pododong.auth+${digest.slice(0, 24)}@gmail.com`;
 }
 
-async function fetchOwnProfile(userId, fallbackLoginName) {
+async function fetchOwnProfile(userId) {
   const { data, error } = await supabase
     .from('profiles')
-    .select('login_name, display_name')
+    .select('login_name, display_name, profile_image_url')
     .eq('id', userId)
     .maybeSingle();
 
   if (error || !data) {
-    return {
-      login_name: fallbackLoginName,
-      display_name: fallbackLoginName,
-    };
+    return null;
   }
 
   return data;
 }
 
-async function ensureOwnProfile(userId, loginName) {
-  const { error } = await supabase.from('profiles').upsert(
-    {
-      id: userId,
-      login_name: loginName,
-      display_name: loginName,
-    },
-    {
-      onConflict: 'id',
-      ignoreDuplicates: false,
-    }
-  );
+async function ensureOwnProfile(userId, loginName, profileImageUrl = null) {
+  const existingProfile = await fetchOwnProfile(userId);
+  const nextProfile = {
+    id: userId,
+    login_name: existingProfile?.login_name?.trim() || loginName,
+    display_name: existingProfile?.display_name?.trim() || loginName,
+    profile_image_url: normalizeProfileImageUrl(existingProfile?.profile_image_url ?? profileImageUrl),
+  };
+
+  const { error } = await supabase.from('profiles').upsert(nextProfile, {
+    onConflict: 'id',
+    ignoreDuplicates: false,
+  });
 
   if (error) {
-    return {
-      login_name: loginName,
-      display_name: loginName,
-    };
+    return existingProfile ?? buildFallbackProfile(loginName, profileImageUrl);
   }
 
-  return fetchOwnProfile(userId, loginName);
+  return (await fetchOwnProfile(userId)) ?? buildFallbackProfile(loginName, profileImageUrl);
 }
 
 function getProfileSeedFromUser(user) {
@@ -63,6 +76,12 @@ function getProfileSeedFromUser(user) {
     user?.raw_user_meta_data?.login_name ??
     user?.raw_user_meta_data?.display_name ??
     '';
+  const profileImageUrl =
+    user?.user_metadata?.profile_image_url ??
+    user?.user_metadata?.avatar_url ??
+    user?.raw_user_meta_data?.profile_image_url ??
+    user?.raw_user_meta_data?.avatar_url ??
+    null;
 
   const loginName = normalizeLoginName(rawLoginName);
 
@@ -73,6 +92,7 @@ function getProfileSeedFromUser(user) {
   return {
     userId: user.id,
     loginName,
+    profileImageUrl: normalizeProfileImageUrl(profileImageUrl),
   };
 }
 
@@ -102,7 +122,7 @@ export async function ensureCurrentUserProfile(user = null) {
     return null;
   }
 
-  return ensureOwnProfile(profileSeed.userId, profileSeed.loginName);
+  return ensureOwnProfile(profileSeed.userId, profileSeed.loginName, profileSeed.profileImageUrl);
 }
 
 export async function loginWithNamePassword({ loginName, password }) {
@@ -160,6 +180,7 @@ export async function loginWithNamePassword({ loginName, password }) {
         id: signInData.user.id,
         loginName: existingProfile.login_name,
         displayName: existingProfile.display_name,
+        profileImageUrl: existingProfile.profile_image_url,
       },
       session: signInData.session,
     };
@@ -220,6 +241,7 @@ export async function loginWithNamePassword({ loginName, password }) {
       id: signUpData.user.id,
       loginName: newProfile.login_name,
       displayName: newProfile.display_name,
+      profileImageUrl: newProfile.profile_image_url,
     },
     session: nextSession,
   };

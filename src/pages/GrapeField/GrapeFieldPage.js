@@ -14,6 +14,8 @@ import { fetchGrapeField } from '../../lib/grapeApi';
 export function GrapeFieldPage({
   authState = 'loggedOut',
   onLogout,
+  currentUser = null,
+  currentProfile = null,
   isAuthenticated = false,
   isAuthLoading = false,
   isSupabaseReady = false,
@@ -80,6 +82,8 @@ export function GrapeFieldPage({
         authState={authState}
         authButtonTo={authState === 'loggedIn' ? undefined : ROUTES.login}
         onAuthButtonClick={authState === 'loggedIn' ? onLogout : undefined}
+        currentUser={currentUser}
+        currentProfile={currentProfile}
       />
 
       <main className="grape-field-page">

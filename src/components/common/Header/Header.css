@@ -76,6 +76,9 @@
 }
 
 .site-header__action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
   justify-self: end;
 }
 

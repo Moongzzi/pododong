@@ -5,14 +5,17 @@ import { Route, Routes } from 'react-router-dom';
 
 import { GrapeClusterPage } from './pages/GrapeCluster/GrapeClusterPage';
 import { GrapeFieldPage } from './pages/GrapeField/GrapeFieldPage';
+import { fetchCurrentUserProfile } from './lib/auth';
 import { ROUTES } from './constants/routes';
 import { isSupabaseConfigured, supabase } from './lib/supabase';
 import { THEME_STYLE } from './constants/theme';
 import { HomePage } from './pages/Home/HomePage';
 import { LoginPage } from './pages/Login/LoginPage';
+import { ProfileSettingsPage } from './pages/ProfileSettings/ProfileSettingsPage';
 
 function App() {
   const [session, setSession] = useState(null);
+  const [currentProfile, setCurrentProfile] = useState(null);
   const [isAuthLoading, setIsAuthLoading] = useState(isSupabaseConfigured);
 
   useEffect(() => {
@@ -49,6 +52,35 @@ function App() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!isSupabaseConfigured || !session?.user) {
+      setCurrentProfile(null);
+      return undefined;
+    }
+
+    let isMounted = true;
+
+    async function loadCurrentProfile() {
+      try {
+        const profile = await fetchCurrentUserProfile(session.user);
+
+        if (isMounted) {
+          setCurrentProfile(profile);
+        }
+      } catch {
+        if (isMounted) {
+          setCurrentProfile(null);
+        }
+      }
+    }
+
+    loadCurrentProfile();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [session]);
+
   async function handleLogout() {
     if (!supabase) {
       return;
@@ -66,6 +98,8 @@ function App() {
     isSupabaseReady: isSupabaseConfigured,
     onLogout: handleLogout,
     currentUser: session?.user ?? null,
+    currentProfile,
+    onProfileUpdated: setCurrentProfile,
   };
 
   return (
@@ -74,6 +108,7 @@ function App() {
         <Route path={ROUTES.home} element={<HomePage {...sharedPageProps} />} />
         <Route path={ROUTES.grapeCluster} element={<GrapeClusterPage {...sharedPageProps} />} />
         <Route path={ROUTES.grapeField} element={<GrapeFieldPage {...sharedPageProps} />} />
+        <Route path={ROUTES.profileSettings} element={<ProfileSettingsPage {...sharedPageProps} />} />
         <Route path={ROUTES.login} element={<LoginPage {...sharedPageProps} />} />
       </Routes>
     </div>

@@ -4,6 +4,7 @@ import { Link, NavLink } from 'react-router-dom';
 
 import podoLogo from '../../../assets/images/logo/podo-logo.png';
 import { AuthButton } from '../AuthButton/AuthButton';
+import { ProfileButton } from '../ProfileButton/ProfileButton';
 
 export function Header({
   brandLabel,
@@ -11,6 +12,8 @@ export function Header({
   authState = 'loggedOut',
   authButtonTo,
   onAuthButtonClick,
+  currentUser = null,
+  currentProfile = null,
 }) {
   return (
     <header className="site-header">
@@ -44,6 +47,7 @@ export function Header({
         </nav>
 
         <div className="site-header__action">
+          {authState === 'loggedIn' ? <ProfileButton user={currentUser} profile={currentProfile} /> : null}
           <AuthButton state={authState} to={authButtonTo} onClick={onAuthButtonClick} />
         </div>
       </div>

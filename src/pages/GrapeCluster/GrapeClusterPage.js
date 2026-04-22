@@ -44,6 +44,7 @@ export function GrapeClusterPage({
   authState = 'loggedOut',
   onLogout,
   currentUser = null,
+  currentProfile = null,
   isAuthenticated = false,
   isAuthLoading = false,
   isSupabaseReady = false,
@@ -265,6 +266,8 @@ export function GrapeClusterPage({
         authState={authState}
         authButtonTo={authState === 'loggedIn' ? undefined : ROUTES.login}
         onAuthButtonClick={authState === 'loggedIn' ? onLogout : undefined}
+        currentUser={currentUser}
+        currentProfile={currentProfile}
       />
 
       <main className="grape-cluster-page">

@@ -15,7 +15,13 @@ const RANK_ACCENT_CLASS = {
   3: 'winner-showcase__avatar--mint',
 };
 
-export function HomePage({ authState = 'loggedOut', onLogout, isSupabaseReady = false }) {
+export function HomePage({
+  authState = 'loggedOut',
+  onLogout,
+  isSupabaseReady = false,
+  currentUser = null,
+  currentProfile = null,
+}) {
   const [members, setMembers] = useState([]);
   const [isLoading, setIsLoading] = useState(isSupabaseReady);
   const [errorMessage, setErrorMessage] = useState('');
@@ -76,6 +82,8 @@ export function HomePage({ authState = 'loggedOut', onLogout, isSupabaseReady = 
         authState={authState}
         authButtonTo={authState === 'loggedIn' ? undefined : ROUTES.login}
         onAuthButtonClick={authState === 'loggedIn' ? onLogout : undefined}
+        currentUser={currentUser}
+        currentProfile={currentProfile}
       />
 
       <main className="home-page">

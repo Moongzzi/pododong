@@ -112,6 +112,62 @@ function getProfileSeedFromUser(user) {
   };
 }
 
+export async function fetchCurrentUserProfile(user = null) {
+  if (!supabase) {
+    throw new Error('Supabase 설정이 완료되지 않았습니다.');
+  }
+
+  let nextUser = user;
+
+  if (!nextUser) {
+    const {
+      data: { user: authenticatedUser },
+      error,
+    } = await supabase.auth.getUser();
+
+    if (error) {
+      throw new Error('현재 사용자 정보를 확인하지 못했습니다.');
+    }
+
+    nextUser = authenticatedUser;
+  }
+
+  if (!nextUser?.id) {
+    return null;
+  }
+
+  return fetchOwnProfile(nextUser.id);
+}
+
+export async function updateCurrentUserProfile({ userId, displayName, profileImageUrl }) {
+  if (!supabase) {
+    throw new Error('Supabase 설정이 완료되지 않았습니다.');
+  }
+
+  const trimmedDisplayName = displayName.normalize('NFC').trim();
+  const normalizedProfileImageUrl = normalizeProfileImageUrl(profileImageUrl);
+
+  if (!userId || !trimmedDisplayName) {
+    throw new Error('표시 이름을 입력해 주세요.');
+  }
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .update({
+      display_name: trimmedDisplayName,
+      profile_image_url: normalizedProfileImageUrl,
+    })
+    .eq('id', userId)
+    .select('id, login_name, display_name, profile_image_url')
+    .single();
+
+  if (error) {
+    throw new Error('프로필을 저장하지 못했습니다.');
+  }
+
+  return data;
+}
+
 export async function ensureCurrentUserProfile(user = null) {
   if (!supabase) {
     throw new Error('Supabase 설정이 완료되지 않았습니다.');

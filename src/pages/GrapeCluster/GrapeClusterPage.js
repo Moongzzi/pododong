@@ -26,6 +26,20 @@ function getMonthLength(date) {
   return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
 }
 
+function createMonthDate(year, month) {
+  return new Date(year, month - 1, 1);
+}
+
+function getMonthOptionLabel(date) {
+  return `${date.getFullYear()}년 ${date.getMonth() + 1}월`;
+}
+
+function getAvailableMonthValues(year, currentYear, currentMonth) {
+  const lastMonth = year === currentYear ? currentMonth : 12;
+
+  return Array.from({ length: lastMonth }, (_, index) => index + 1);
+}
+
 export function GrapeClusterPage({
   authState = 'loggedOut',
   onLogout,
@@ -35,9 +49,12 @@ export function GrapeClusterPage({
   isSupabaseReady = false,
 }) {
   const today = new Date();
-  const monthKey = getMonthStart(today);
   const todayKey = getDateString(today);
-  const monthLength = getMonthLength(today);
+  const todayYear = today.getFullYear();
+  const todayMonth = today.getMonth() + 1;
+  const [selectedYear, setSelectedYear] = useState(todayYear);
+  const [selectedMonth, setSelectedMonth] = useState(todayMonth);
+  const [activeMonth, setActiveMonth] = useState(() => createMonthDate(todayYear, todayMonth));
   const [goalValue, setGoalValue] = useState('');
   const [isGoalLocked, setIsGoalLocked] = useState(false);
   const [fills, setFills] = useState([]);
@@ -47,10 +64,38 @@ export function GrapeClusterPage({
   const [isSavingGoal, setIsSavingGoal] = useState(false);
   const [isSavingFill, setIsSavingFill] = useState(false);
 
+  const monthKey = getMonthStart(activeMonth);
+  const monthLength = getMonthLength(activeMonth);
+  const activeYear = activeMonth.getFullYear();
+  const activeMonthNumber = activeMonth.getMonth() + 1;
+  const activeMonthLabel = getMonthOptionLabel(activeMonth);
+  const isCurrentMonth = activeYear === todayYear && activeMonthNumber === todayMonth;
+  const isPastMonth = activeMonth.getTime() < createMonthDate(todayYear, todayMonth).getTime();
+  const yearOptions = useMemo(() => {
+    const startYear = 2024;
+    const endYear = todayYear;
+
+    return Array.from({ length: endYear - startYear + 1 }, (_, index) => endYear - index);
+  }, [todayYear]);
+  const monthOptions = useMemo(
+    () =>
+      getAvailableMonthValues(selectedYear, todayYear, todayMonth).map((month) => ({
+        value: month,
+        label: `${month}월`,
+      })),
+    [selectedYear, todayMonth, todayYear]
+  );
+  const isGoalEditable = isCurrentMonth && !isGoalLocked;
+
   const isGoalReady = isGoalLocked && goalValue.trim().length > 0;
   const hasFilledToday = fills.some((fill) => fill.date === todayKey);
   const displayFills = GRAPE_CLUSTER_INSPECTION_MODE ? [] : fills;
-  const isFillBlocked = !isGoalReady || hasFilledToday || fills.length >= monthLength || isSavingFill;
+  const isFillBlocked =
+    !isGoalReady ||
+    !isCurrentMonth ||
+    hasFilledToday ||
+    fills.length >= monthLength ||
+    isSavingFill;
   const backgroundImage = MONTH_BACKGROUND_MAP[monthLength];
   const positions = useMemo(() => getGrapePositions(monthLength), [monthLength]);
 
@@ -107,12 +152,37 @@ export function GrapeClusterPage({
     setGoalValue(event.target.value);
   }
 
+  function handleYearChange(event) {
+    const nextYear = Number(event.target.value);
+    const availableMonths = getAvailableMonthValues(nextYear, todayYear, todayMonth);
+    const nextMonth = availableMonths.includes(selectedMonth)
+      ? selectedMonth
+      : availableMonths[availableMonths.length - 1];
+
+    setSelectedYear(nextYear);
+    setSelectedMonth(nextMonth);
+  }
+
+  function handleMonthChange(event) {
+    setSelectedMonth(Number(event.target.value));
+  }
+
+  function handleSearchMonth() {
+    setActiveMonth(createMonthDate(selectedYear, selectedMonth));
+  }
+
+  function handleResetToToday() {
+    setSelectedYear(todayYear);
+    setSelectedMonth(todayMonth);
+    setActiveMonth(createMonthDate(todayYear, todayMonth));
+  }
+
   async function handleGoalSubmit(event) {
     event.preventDefault();
 
     const trimmedGoal = goalValue.trim();
 
-    if (!trimmedGoal || !currentUser?.id || isSavingGoal) {
+    if (!trimmedGoal || !currentUser?.id || isSavingGoal || !isCurrentMonth) {
       return;
     }
 
@@ -198,20 +268,41 @@ export function GrapeClusterPage({
       />
 
       <main className="grape-cluster-page">
-        {isPageLoading ? <p className="grape-cluster-page__status">이번 달 포도송이를 불러오는 중입니다.</p> : null}
+        {isPageLoading ? <p className="grape-cluster-page__status">{activeMonthLabel} 포도송이를 불러오는 중입니다.</p> : null}
         {feedbackMessage ? <p className="grape-cluster-page__status grape-cluster-page__status--success">{feedbackMessage}</p> : null}
         {errorMessage ? <p className="grape-cluster-page__status grape-cluster-page__status--error">{errorMessage}</p> : null}
         {!isPageLoading && !errorMessage && !goalValue.trim() ? (
-          <p className="grape-cluster-page__status">이번 달 목표를 저장하면 포도알을 하루에 한 번씩 채울 수 있습니다.</p>
+          <p className="grape-cluster-page__status">
+            {isCurrentMonth
+              ? '이번 달 목표를 저장하면 포도알을 하루에 한 번씩 채울 수 있습니다.'
+              : isPastMonth
+              ? `${activeMonthLabel} 목표와 포도 기록을 조회할 수 있습니다.`
+              : `${activeMonthLabel} 데이터는 조회만 가능합니다.`}
+          </p>
         ) : null}
         {!isPageLoading && !errorMessage && isGoalReady && fills.length === 0 ? (
-          <p className="grape-cluster-page__status">아직 채워진 포도알이 없습니다. 오늘의 첫 포도알을 채워 보세요.</p>
+          <p className="grape-cluster-page__status">
+            {isCurrentMonth
+              ? '아직 채워진 포도알이 없습니다. 오늘의 첫 포도알을 채워 보세요.'
+              : `${activeMonthLabel}에는 아직 채워진 포도알이 없습니다.`}
+          </p>
         ) : null}
 
         <MonthlyGoalForm
+          monthLabel={activeMonthLabel}
           goalValue={goalValue}
           isLocked={isGoalLocked}
+          isEditable={isGoalEditable}
+          isSaving={isSavingGoal}
+          selectedYear={selectedYear}
+          selectedMonth={selectedMonth}
+          yearOptions={yearOptions}
+          monthOptions={monthOptions}
           onChange={handleGoalChange}
+          onYearChange={handleYearChange}
+          onMonthChange={handleMonthChange}
+          onSearch={handleSearchMonth}
+          onResetToToday={handleResetToToday}
           onSubmit={handleGoalSubmit}
         />
 
@@ -223,6 +314,7 @@ export function GrapeClusterPage({
           fills={displayFills}
           onFillToday={handleFillToday}
           isFillBlocked={isFillBlocked}
+          isCurrentMonth={isCurrentMonth}
           isGoalReady={isGoalReady}
           inspectionMode={GRAPE_CLUSTER_INSPECTION_MODE}
         />

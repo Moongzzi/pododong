@@ -20,6 +20,7 @@ export function GrapeClusterBoard({
   fills,
   onFillToday,
   isFillBlocked,
+  isCurrentMonth = true,
   isGoalReady = true,
   inspectionMode = false,
 }) {
@@ -87,6 +88,8 @@ export function GrapeClusterBoard({
         <p className="grape-board__hint">
           {inspectionMode
             ? '위치 확인을 위해 이번 달 포도알을 모두 표시 중입니다.'
+            : !isCurrentMonth
+            ? '선택한 월은 조회와 목표 저장만 가능합니다. 포도 채우기는 이번 달에만 할 수 있습니다.'
             : !isGoalReady
             ? '이번 달 목표를 저장한 뒤 포도알을 채울 수 있습니다.'
             : isFillBlocked
